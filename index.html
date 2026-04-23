@@ -1,0 +1,1408 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🍃 Уголок Зелёного | D&D 5e</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-dark: #0d1f0d;
+            --bg-medium: #1a2e1a;
+            --bg-light: #2a4a2a;
+            --text-primary: #e8f0e0;
+            --text-secondary: #a0c8a0;
+            --accent: #4a9a4a;
+            --accent-light: #6ac06a;
+            --accent-glow: #8aff8a;
+            --border-color: #3a6e3a;
+            --shadow: rgba(0, 0, 0, 0.5);
+            --wood-dark: #3a2510;
+            --wood-light: #5a3a1a;
+            --candle-wax: #e8d8a0;
+            --dice-color: #c8a850;
+            --texture-line1: rgba(255, 255, 255, 0.08);
+            --texture-line2: rgba(255, 255, 255, 0.04);
+        }
+
+        [data-theme="light"] {
+            --bg-dark: #c8dcc8;
+            --bg-medium: #d8e8d8;
+            --bg-light: #e8f4e8;
+            --text-primary: #1a2e1a;
+            --text-secondary: #3a5e3a;
+            --accent: #3a8a3a;
+            --accent-light: #4aaa4a;
+            --accent-glow: #2a8a2a;
+            --border-color: #5a9a5a;
+            --shadow: rgba(0, 0, 0, 0.15);
+            --wood-dark: #6a4a2a;
+            --wood-light: #8a6a4a;
+            --candle-wax: #f0e8c0;
+            --dice-color: #b8a050;
+            --texture-line1: rgba(0, 0, 0, 0.06);
+            --texture-line2: rgba(0, 0, 0, 0.03);
+        }
+
+        body {
+            font-family: 'Segoe UI', 'Arial', sans-serif;
+            background: var(--bg-dark);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 10px;
+            background-image: 
+                repeating-linear-gradient(45deg, var(--texture-line1) 0px, var(--texture-line1) 1px, transparent 1px, transparent 8px),
+                repeating-linear-gradient(-45deg, var(--texture-line2) 0px, var(--texture-line2) 1px, transparent 1px, transparent 8px);
+        }
+
+        .theme-toggle {
+            position: fixed;
+            top: 10px;
+            right: 20px;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .toggle-icon {
+            font-size: 26px;
+            color: var(--accent);
+            opacity: 0.8;
+            transition: all 0.2s ease;
+        }
+
+        .theme-toggle:hover .toggle-icon {
+            opacity: 1;
+            color: var(--accent-light);
+        }
+
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 48px;
+            height: 24px;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: transparent;
+            transition: 0.3s;
+            border-radius: 24px;
+            border: 2px solid var(--border-color);
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 2px;
+            bottom: 1px;
+            background-color: var(--accent);
+            transition: 0.3s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(22px);
+        }
+
+        .switch:hover .slider:before {
+            background-color: var(--accent-light);
+        }
+
+        .app {
+            max-width: 1000px;
+            width: 100%;
+            margin: 0 auto;
+        }
+
+        .screen {
+            display: none;
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        .screen.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ===== СЦЕНА ТАВЕРНЫ ===== */
+        .tavern-scene {
+            position: relative;
+            min-height: 750px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px 20px 40px;
+            background: var(--bg-medium);
+            border-radius: 48px;
+            border: 2px solid var(--border-color);
+            box-shadow: 0 20px 40px var(--shadow), inset 0 0 60px rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(4px);
+            overflow: hidden;
+        }
+
+        .tavern-scene::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(circle at 30% 40%, rgba(255, 200, 100, 0.03) 0%, transparent 30%),
+                radial-gradient(circle at 70% 60%, rgba(255, 200, 100, 0.02) 0%, transparent 40%);
+            pointer-events: none;
+        }
+
+        /* ===== СТОЛ ===== */
+        .table {
+            position: absolute;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 550px;
+            height: 35px;
+            background: linear-gradient(180deg, var(--wood-light) 0%, var(--wood-dark) 100%);
+            border-radius: 16px;
+            box-shadow: 0 10px 0 #2a1a0a, 0 25px 35px var(--shadow), inset 0 3px 8px rgba(255,255,255,0.15);
+            border: 1px solid #7a5a3a;
+            z-index: 5;
+        }
+
+        .table::before,
+        .table::after {
+            content: '';
+            position: absolute;
+            bottom: -70px;
+            width: 25px;
+            height: 70px;
+            background: linear-gradient(90deg, #4a2a10 0%, #3a1a08 100%);
+            border-radius: 0 0 8px 8px;
+            box-shadow: inset 0 -5px 5px rgba(0,0,0,0.3);
+            border-left: 1px solid #5a3a18;
+            border-right: 1px solid #2a1a08;
+            z-index: 4;
+        }
+
+        .table::before { left: 80px; }
+        .table::after { right: 80px; }
+
+        /* ===== СВЕЧИ ===== */
+        .candle {
+            position: absolute;
+            bottom: 75px;
+            z-index: 15;
+            filter: drop-shadow(0 5px 10px var(--shadow));
+        }
+
+        .candle-left { left: 30%; }
+        .candle-right { right: 30%; }
+
+        .candle-body {
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .candle-left .candle-body {
+            width: 20px;
+            height: 70px;
+            background: linear-gradient(90deg, #f0e8c8 0%, #d8c890 50%, #e8d8a0 100%);
+            border-radius: 5px 5px 8px 8px;
+            box-shadow: inset -3px 0 8px rgba(0,0,0,0.1), 0 6px 0 #a89860;
+            border: 1px solid #b8a870;
+        }
+
+        .candle-left .candle-body::after {
+            content: '';
+            position: absolute;
+            top: 15px;
+            left: -3px;
+            width: 8px;
+            height: 22px;
+            background: #e8d8a0;
+            border-radius: 3px;
+            opacity: 0.7;
+            transform: rotate(-5deg);
+        }
+
+        .candle-right .candle-body {
+            width: 28px;
+            height: 55px;
+            background: linear-gradient(90deg, #fff8e0 0%, #e8d8a0 50%, #f0e8c8 100%);
+            border-radius: 6px 6px 10px 10px;
+            box-shadow: inset -3px 0 8px rgba(0,0,0,0.08), 0 6px 0 #a89860;
+            border: 1px solid #c8b880;
+        }
+
+        .candle-wick {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 2px;
+            background: #2a1a0a;
+        }
+
+        .candle-left .candle-wick {
+            height: 12px;
+            top: -12px;
+            background: #1a0a00;
+            border-radius: 1px 1px 0 0;
+        }
+
+        .candle-right .candle-wick {
+            height: 6px;
+            top: -6px;
+            background: #3a2a1a;
+        }
+
+        .candle-flame {
+            position: absolute;
+            top: -35px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 20px;
+            height: 35px;
+            filter: drop-shadow(0 0 8px rgba(255, 180, 50, 0.5));
+        }
+
+        .candle-left .candle-flame {
+            animation: flickerLeft 2s infinite alternate;
+            filter: drop-shadow(0 0 12px rgba(255, 140, 0, 0.6));
+        }
+
+        .candle-right .candle-flame {
+            animation: flickerRight 1s infinite alternate;
+            filter: drop-shadow(0 0 6px rgba(255, 200, 80, 0.4));
+        }
+
+        .flame-core {
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 10px;
+            height: 18px;
+            background: #fff8e0;
+            border-radius: 50% 50% 50% 50%;
+            box-shadow: 0 0 15px #ffcc44;
+        }
+
+        .candle-left .flame-core {
+            width: 8px;
+            height: 22px;
+            background: #fff0d0;
+            box-shadow: 0 0 20px #ffaa22;
+        }
+
+        .candle-right .flame-core {
+            width: 12px;
+            height: 14px;
+            background: #ffffff;
+            box-shadow: 0 0 10px #ffdd66;
+        }
+
+        .flame-middle {
+            position: absolute;
+            bottom: 5px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 16px;
+            height: 25px;
+            background: radial-gradient(ellipse at center, #ffaa00 0%, #ff6600 80%, transparent 100%);
+            border-radius: 50%;
+            opacity: 0.7;
+            filter: blur(2px);
+        }
+
+        .candle-left .flame-middle {
+            width: 14px;
+            height: 28px;
+            background: radial-gradient(ellipse at center, #ff8800 0%, #cc4400 80%, transparent 100%);
+            opacity: 0.8;
+        }
+
+        .candle-right .flame-middle {
+            width: 18px;
+            height: 20px;
+            background: radial-gradient(ellipse at center, #ffcc44 0%, #ff8822 80%, transparent 100%);
+            opacity: 0.6;
+        }
+
+        .flame-glow {
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 40px;
+            height: 40px;
+            background: radial-gradient(circle at center, rgba(255,170,0,0.4) 0%, transparent 70%);
+            border-radius: 50%;
+            filter: blur(8px);
+        }
+
+        .candle-left .flame-glow {
+            width: 50px;
+            height: 50px;
+            background: radial-gradient(circle at center, rgba(255,100,0,0.3) 0%, transparent 70%);
+            filter: blur(10px);
+        }
+
+        .candle-right .flame-glow {
+            width: 35px;
+            height: 35px;
+            background: radial-gradient(circle at center, rgba(255,200,50,0.5) 0%, transparent 70%);
+            filter: blur(6px);
+        }
+
+        @keyframes flickerLeft {
+            0% { transform: translateX(-50%) scale(1, 1); opacity: 0.85; }
+            15% { transform: translateX(-48%) scale(0.98, 1.02); opacity: 0.82; }
+            30% { transform: translateX(-52%) scale(1.02, 0.98); opacity: 0.88; }
+            45% { transform: translateX(-49%) scale(0.99, 1.01); opacity: 0.84; }
+            60% { transform: translateX(-51%) scale(1.01, 0.99); opacity: 0.86; }
+            75% { transform: translateX(-50%) scale(1, 1); opacity: 0.85; }
+            100% { transform: translateX(-50%) scale(1, 1); opacity: 0.85; }
+        }
+
+        @keyframes flickerRight {
+            0% { transform: translateX(-50%) scale(1, 1); opacity: 0.95; }
+            20% { transform: translateX(-47%) scale(0.99, 1.01); opacity: 0.92; }
+            40% { transform: translateX(-53%) scale(1.01, 0.99); opacity: 0.97; }
+            60% { transform: translateX(-50%) scale(1, 1); opacity: 0.94; }
+            80% { transform: translateX(-49%) scale(1.005, 0.995); opacity: 0.96; }
+            100% { transform: translateX(-50%) scale(1, 1); opacity: 0.95; }
+        }
+
+        /* ===== КУБИКИ ===== */
+        .dice-on-table {
+            position: absolute;
+            left: 45%;
+            transform: translateX(-50%);
+            bottom: 80px;
+            z-index: 25;
+            display: flex;
+            gap: 25px;
+        }
+
+        .dice {
+            width: 44px;
+            height: 44px;
+            background: var(--dice-color);
+            border-radius: 8px;
+            box-shadow: 0 5px 0 #8a6a2a, 0 8px 15px var(--shadow), inset 0 -2px 3px rgba(0,0,0,0.2);
+            position: relative;
+            cursor: pointer;
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            grid-template-rows: 1fr 1fr 1fr;
+            padding: 6px;
+            gap: 2px;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .dice:hover {
+            transform: translateY(-3px) rotate(-2deg);
+            box-shadow: 0 8px 0 #8a6a2a, 0 12px 20px var(--shadow), inset 0 -2px 3px rgba(0,0,0,0.2);
+        }
+
+        .dice:active {
+            transform: translateY(4px) rotate(2deg);
+            box-shadow: 0 1px 0 #8a6a2a, 0 5px 10px var(--shadow), inset 0 -2px 3px rgba(0,0,0,0.2);
+        }
+
+        .dice.rolling {
+            animation: diceRoll 0.4s ease-out;
+        }
+
+        @keyframes diceRoll {
+            0% { transform: translateY(0) rotate(0deg); }
+            20% { transform: translateY(-20px) rotate(180deg); }
+            40% { transform: translateY(0) rotate(360deg); }
+            60% { transform: translateY(-10px) rotate(540deg); }
+            80% { transform: translateY(0) rotate(720deg); }
+            100% { transform: translateY(0) rotate(720deg); }
+        }
+
+        @keyframes diceShake {
+            0%, 100% { transform: translateX(0) rotate(0deg); }
+            25% { transform: translateX(-1.5px) rotate(-1deg); }
+            75% { transform: translateX(1.5px) rotate(1deg); }
+        }
+
+        .dice.shaking {
+            animation: diceShake 0.1s ease-in-out infinite;
+        }
+
+        .dice.fly-left {
+            transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            transform: translateY(-18px) translateX(-8px) rotate(270deg);
+        }
+
+        .dice.fly-right {
+            transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            transform: translateY(-18px) translateX(8px) rotate(-270deg);
+        }
+
+        .dot {
+            width: 8px;
+            height: 8px;
+            background: #2a1a0a;
+            border-radius: 50%;
+            box-shadow: inset 0 1px 2px rgba(255,255,255,0.3);
+            justify-self: center;
+            align-self: center;
+        }
+
+        .dot.top-left { grid-area: 1 / 1; }
+        .dot.top-right { grid-area: 1 / 3; }
+        .dot.middle-left { grid-area: 2 / 1; }
+        .dot.center { grid-area: 2 / 2; }
+        .dot.middle-right { grid-area: 2 / 3; }
+        .dot.bottom-left { grid-area: 3 / 1; }
+        .dot.bottom-right { grid-area: 3 / 3; }
+
+        /* ===== ЗЕЛЁНЫЙ ОГОНЬ ===== */
+        .tavern-scene.magic-active .candle-flame {
+            filter: drop-shadow(0 0 10px rgba(130,210,130,0.6)) drop-shadow(0 0 18px rgba(100,180,100,0.35));
+            transition: filter 0.5s ease;
+        }
+
+        .tavern-scene.magic-active .flame-core {
+            background: #f8fff0;
+            box-shadow: 0 0 14px #aaffaa, 0 0 22px rgba(120,200,120,0.35);
+            transition: all 0.5s ease;
+        }
+
+        .tavern-scene.magic-active .flame-middle {
+            background: radial-gradient(ellipse at center, #ffcc66 0%, #cc8844 60%, transparent 100%);
+            opacity: 0.8;
+            transition: all 0.5s ease;
+        }
+
+        .tavern-scene.magic-active .flame-glow {
+            background: radial-gradient(circle at center, rgba(160,210,140,0.45) 0%, rgba(255,170,50,0.25) 35%, transparent 70%);
+            filter: blur(10px);
+            transition: all 0.5s ease;
+        }
+
+        .tavern-scene.flash {
+            animation: greenFlash 0.6s ease-out;
+        }
+
+        @keyframes greenFlash {
+            0% { 
+                box-shadow: 0 20px 40px var(--shadow), 
+                            inset 0 0 120px rgba(100,255,100,0.6),
+                            inset 0 0 40px rgba(80,200,80,0.4);
+            }
+            100% { 
+                box-shadow: 0 20px 40px var(--shadow), 
+                            inset 0 0 60px rgba(0,0,0,0.2);
+            }
+        }
+
+        /* ===== ТЕКСТ ===== */
+        .welcome-text-container {
+            position: absolute;
+            top: 5px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 30;
+            text-align: center;
+            max-width: 700px;
+            width: 90%;
+            padding: 10px;
+        }
+
+        .greeting-text {
+            color: var(--text-primary);
+            font-size: 42px;
+            font-weight: 300;
+            margin-bottom: 15px;
+            letter-spacing: 2px;
+            text-shadow: 2px 2px 4px var(--shadow);
+        }
+
+        .welcome-message {
+            color: var(--text-secondary);
+            font-size: 22px;
+            line-height: 1.7;
+            margin-bottom: 25px;
+            text-shadow: 1px 1px 3px var(--shadow);
+        }
+
+        .reassurance-text {
+            color: var(--text-secondary);
+            font-size: 20px;
+            font-style: italic;
+            margin-bottom: 30px;
+            text-shadow: 1px 1px 2px var(--shadow);
+        }
+
+        .call-to-action {
+            color: var(--text-primary);
+            font-size: 26px;
+            font-weight: 500;
+            margin-bottom: 30px;
+            text-shadow: 1px 1px 3px var(--shadow);
+        }
+
+        .master-name {
+            color: var(--accent-glow);
+            font-weight: bold;
+            text-shadow: 0 0 10px rgba(106, 192, 106, 0.5);
+        }
+
+        .start-link-container {
+            margin-top: 20px;
+        }
+
+        .action-link {
+            color: var(--accent-light);
+            font-size: 28px;
+            font-style: italic;
+            cursor: pointer;
+            display: inline-block;
+            padding: 8px 30px;
+            text-shadow: 0 0 8px rgba(106,192,106,0.3);
+            letter-spacing: 2px;
+            border-bottom: 2px dashed var(--border-color);
+            transition: all 0.3s ease;
+        }
+
+        .action-link:hover {
+            color: var(--accent-glow);
+            transform: scale(1.05);
+            text-shadow: 0 0 12px rgba(106,192,106,0.5), 0 0 25px rgba(100,180,100,0.3);
+            letter-spacing: 3px;
+            border-bottom: 2px solid var(--accent-light);
+        }
+
+        @keyframes linkPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.03); }
+        }
+
+        .start-link-container.magic-active .action-link {
+            animation: linkPulse 2.5s ease-in-out infinite;
+        }
+
+        /* ===== ЭКРАН ВЫБОРА РАСЫ ===== */
+        .race-screen-content {
+            background: var(--bg-medium);
+            border-radius: 48px;
+            border: 2px solid var(--border-color);
+            padding: 40px;
+            backdrop-filter: blur(4px);
+            box-shadow: 0 20px 40px var(--shadow);
+        }
+
+        .race-screen-content h2 {
+            color: var(--text-primary);
+            font-size: 36px;
+            font-weight: 300;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .race-intro {
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 18px;
+            line-height: 1.7;
+            max-width: 700px;
+            margin: 0 auto 30px;
+            font-style: italic;
+        }
+
+        .race-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin: 30px 0;
+        }
+
+        .race-card {
+            background: var(--bg-light);
+            border: 2px solid var(--border-color);
+            border-radius: 20px;
+            padding: 25px 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            backdrop-filter: blur(4px);
+        }
+
+        .race-card:hover {
+            transform: scale(1.05);
+            border-color: var(--accent-light);
+            box-shadow: 0 10px 25px var(--shadow);
+            background: var(--bg-medium);
+        }
+
+        .race-emoji {
+            font-size: 48px;
+            margin-bottom: 15px;
+        }
+
+        .race-card h3 {
+            color: var(--text-primary);
+            font-size: 22px;
+            margin-bottom: 8px;
+        }
+
+        .race-card p {
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        .nav-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 30px;
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--text-primary);
+            border: 2px solid var(--border-color);
+            padding: 14px 30px;
+            font-size: 18px;
+            border-radius: 40px;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+
+        .btn-secondary:hover {
+            border-color: var(--accent-light);
+            background: rgba(74,154,74,0.15);
+        }
+
+        /* ===== АДАПТИВНОСТЬ ===== */
+        @media (max-width: 900px) {
+            .table { width: 450px; height: 30px; }
+            .table::before, .table::after { bottom: -55px; width: 20px; height: 55px; }
+            .table::before { left: 60px; }
+            .table::after { right: 60px; }
+            .candle { bottom: 65px; }
+            .candle-left { left: 28%; }
+            .candle-right { right: 28%; }
+            .dice-on-table { bottom: 70px; }
+            .welcome-text-container { position: relative; transform: translateY(-50px); max-width: 85%; margin: 0 auto; padding: 15px; left: auto; right: auto; }
+            .greeting-text { font-size: 34px; }
+            .welcome-message { font-size: 19px; }
+            .reassurance-text { font-size: 17px; }
+            .call-to-action { font-size: 21px; }
+            .action-link { font-size: 23px; }
+        }
+
+        @media (max-width: 500px) {
+            body { padding: 5px; align-items: flex-start; min-height: auto; }
+            .app { max-width: 100%; width: 100%; padding-top: 35px; }
+            .tavern-scene { height: auto; margin: 20px; padding: 25px; border-radius: 20px; width: 100%; }
+            .table { width: 250px; height: 20px; bottom: 35px; }
+            .table::before, .table::after { bottom: -32px; width: 14px; height: 32px; }
+            .table::before { left: 40px; }
+            .table::after { right: 40px; }
+            .candle { bottom: 45px; }
+            .candle-left { left: 26%; }
+            .candle-right { right: 26%; }
+            .candle-left .candle-body { width: 14px; height: 44px; }
+            .candle-left .candle-wick { height: 9px; top: -9px; }
+            .candle-left .candle-flame { width: 12px; height: 22px; top: -22px; }
+            .candle-left .flame-core { width: 6px; height: 14px; }
+            .candle-left .flame-middle { width: 10px; height: 18px; }
+            .candle-left .flame-glow { width: 28px; height: 28px; bottom: -7px; }
+            .candle-right .candle-body { width: 20px; height: 34px; }
+            .candle-right .candle-wick { height: 5px; top: -5px; }
+            .candle-right .candle-flame { width: 14px; height: 18px; top: -18px; }
+            .candle-right .flame-core { width: 8px; height: 9px; }
+            .candle-right .flame-middle { width: 12px; height: 12px; }
+            .candle-right .flame-glow { width: 24px; height: 24px; bottom: -5px; }
+            .dice-on-table { bottom: 45px; gap: 12px; }
+            .dice { width: 28px; height: 28px; padding: 3px; border-radius: 5px; }
+            .dot { width: 5px; height: 5px; }
+            .welcome-text-container { position: relative; transform: none; margin: 0 auto 15px; padding: 8px; max-width: 100%; }
+            .greeting-text { font-size: 22px; margin-bottom: 10px; }
+            .welcome-message { font-size: 14px; margin-bottom: 15px; }
+            .reassurance-text { font-size: 12px; margin-bottom: 12px; }
+            .call-to-action { font-size: 15px; margin-bottom: 12px; }
+            .action-link { font-size: 17px; padding: 5px 18px; }
+        }
+    </style>
+</head>
+<body data-theme="dark">
+
+    <div class="theme-toggle">
+        <span class="toggle-icon">☼</span>
+        <label class="switch">
+            <input type="checkbox" id="themeSwitch">
+            <span class="slider"></span>
+        </label>
+        <span class="toggle-icon">☽</span>
+    </div>
+
+    <div class="app">
+        <!-- ПРИВЕТСТВИЕ -->
+        <div class="screen active" id="welcomeScreen">
+            <div class="tavern-scene">
+                <div class="table"></div>
+                
+                <div class="candle candle-left">
+                    <div class="candle-body"></div>
+                    <div class="candle-wick"></div>
+                    <div class="candle-flame">
+                        <div class="flame-middle"></div>
+                        <div class="flame-core"></div>
+                        <div class="flame-glow"></div>
+                    </div>
+                </div>
+
+                <div class="dice-on-table">
+                    <div class="dice" id="diceLeft"></div>
+                    <div class="dice" id="diceRight"></div>
+                </div>
+
+                <div class="candle candle-right">
+                    <div class="candle-body"></div>
+                    <div class="candle-wick"></div>
+                    <div class="candle-flame">
+                        <div class="flame-middle"></div>
+                        <div class="flame-core"></div>
+                        <div class="flame-glow"></div>
+                    </div>
+                </div>
+                
+                <div class="welcome-text-container">
+                    <div class="greeting-text">Привет, путник!</div>
+                    <div class="welcome-message">
+                        Заходи, присаживайся к столу.<br>
+                        Я — <span class="master-name">Зелёный</span>, и это мой уголок<br>
+                        для создания героев D&D 5-й редакции.
+                    </div>
+                    <div class="reassurance-text">
+                        Здесь нет неправильных выборов.<br>
+                        Есть только твоя история.
+                    </div>
+                    <div class="call-to-action">
+                        Давай создадим того, кем ты будешь гордиться.
+                    </div>
+                    <div class="start-link-container">
+                        <span class="action-link" id="startJourneyLink">…начать путь</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ВЫБОР РАСЫ -->
+        <div class="screen" id="raceScreen">
+            <div class="race-screen-content">
+                <h2>🧝 Выбери свою расу</h2>
+                <div class="race-intro">
+                    <p>«Итак, с чего начнём? Пожалуй, с самого важного — с твоей крови. 
+                    Кто ты? Смертный, чей век короток, но амбиции безграничны? 
+                    Дитя древнего народа? Или в тебе течёт нечто иное?»</p>
+                </div>
+                <div class="race-grid">
+                    <div class="race-card" data-race="human">
+                        <div class="race-emoji">👤</div>
+                        <h3>Человек</h3>
+                        <p>Амбициозные, приспособленные</p>
+                    </div>
+                    <div class="race-card" data-race="elf">
+                        <div class="race-emoji">🧝</div>
+                        <h3>Эльф</h3>
+                        <p>Изящные, магические, древние</p>
+                    </div>
+                    <div class="race-card" data-race="dwarf">
+                        <div class="race-emoji">⚒️</div>
+                        <h3>Дварф</h3>
+                        <p>Крепкие, умелые, гордые</p>
+                    </div>
+                </div>
+                <div class="nav-buttons">
+                    <button class="btn-secondary" id="backToWelcomeBtn">← Назад</button>
+                    <div></div>
+                </div>
+                <p style="text-align: center; color: var(--text-secondary); margin-top: 20px;">
+                    🍃 Остальные расы скоро появятся...
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+(function() {
+    'use strict';
+
+    const state = {
+        currentScreen: 'welcome',
+        theme: 'dark',
+        isTransitioning: false,
+        hasVisited: false
+    };
+
+    const welcomeScreen = document.getElementById('welcomeScreen');
+    const raceScreen = document.getElementById('raceScreen');
+    const startLink = document.getElementById('startJourneyLink');
+    const startLinkContainer = document.querySelector('.start-link-container');
+    const backBtn = document.getElementById('backToWelcomeBtn');
+    const themeSwitch = document.getElementById('themeSwitch');
+    const body = document.body;
+    const diceLeft = document.getElementById('diceLeft');
+    const diceRight = document.getElementById('diceRight');
+    const tavernScene = document.querySelector('.tavern-scene');
+
+    const greetingText = document.querySelector('.greeting-text');
+    const welcomeMessage = document.querySelector('.welcome-message');
+    const reassuranceText = document.querySelector('.reassurance-text');
+    const callToAction = document.querySelector('.call-to-action');
+
+    const textElements = [greetingText, welcomeMessage, reassuranceText, callToAction, startLinkContainer];
+
+    function showScreen(screenId) {
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        
+        if (screenId === 'welcome') {
+            welcomeScreen.classList.add('active');
+            
+            if (!state.hasVisited) {
+                state.hasVisited = true;
+                animateWelcomeText();
+            } else {
+                showAllText();
+            }
+        } else if (screenId === 'raceSelect') {
+            raceScreen.classList.add('active');
+        }
+        
+        state.currentScreen = screenId;
+    }
+
+    function animateWelcomeText() {
+        const delays = [300, 1000, 2400, 3800, 5000];
+
+        textElements.forEach(el => {
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(15px)';
+            el.style.transition = 'opacity 0.6s ease-out, transform 0.6s ease-out';
+        });
+
+        textElements.forEach((el, i) => {
+            setTimeout(() => {
+                el.style.opacity = '1';
+                el.style.transform = 'translateY(0)';
+            }, delays[i]);
+        });
+    }
+
+    function showAllText() {
+        textElements.forEach(el => {
+            el.style.transition = 'none';
+            el.style.opacity = '1';
+            el.style.transform = 'translateY(0)';
+        });
+    }
+
+    function toggleTheme() {
+        body.setAttribute('data-theme', themeSwitch.checked ? 'light' : 'dark');
+    }
+
+    function drawDiceFaces(d, v) {
+        d.innerHTML = '';
+        const p = {
+            1: ['center'], 2: ['top-left','bottom-right'], 3: ['top-left','center','bottom-right'],
+            4: ['top-left','top-right','bottom-left','bottom-right'],
+            5: ['top-left','top-right','center','bottom-left','bottom-right'],
+            6: ['top-left','top-right','middle-left','middle-right','bottom-left','bottom-right']
+        };
+        p[v].forEach(pos => {
+            const dot = document.createElement('span');
+            dot.className = 'dot ' + pos;
+            d.appendChild(dot);
+        });
+    }
+
+    function rollDice(d) {
+        if (d.classList.contains('rolling') || d.classList.contains('shaking') || state.isTransitioning) return;
+        d.classList.add('rolling');
+        let i = 0;
+        const t = setInterval(() => {
+            drawDiceFaces(d, Math.floor(Math.random() * 6) + 1);
+            if (++i >= 8) {
+                clearInterval(t);
+                drawDiceFaces(d, Math.floor(Math.random() * 6) + 1);
+                setTimeout(() => d.classList.remove('rolling'), 100);
+            }
+        }, 50);
+    }
+
+    startLink.addEventListener('mouseenter', () => {
+        if (state.isTransitioning) return;
+        diceLeft.classList.add('shaking');
+        diceRight.classList.add('shaking');
+        tavernScene.classList.add('magic-active');
+        startLinkContainer.classList.add('magic-active');
+    });
+
+    startLink.addEventListener('mouseleave', () => {
+        diceLeft.classList.remove('shaking');
+        diceRight.classList.remove('shaking');
+        tavernScene.classList.remove('magic-active');
+        startLinkContainer.classList.remove('magic-active');
+    });
+
+    startLink.addEventListener('click', () => {
+        if (state.isTransitioning) return;
+        state.isTransitioning = true;
+
+        diceLeft.classList.remove('shaking');
+        diceRight.classList.remove('shaking');
+        tavernScene.classList.remove('magic-active');
+        startLinkContainer.classList.remove('magic-active');
+
+        diceLeft.classList.add('fly-left');
+        diceRight.classList.add('fly-right');
+        tavernScene.classList.add('flash');
+        startLink.style.opacity = '0';
+
+        setTimeout(() => {
+            diceLeft.classList.remove('fly-left');
+            diceRight.classList.remove('fly-right');
+            tavernScene.classList.remove('flash');
+            startLink.style.opacity = '1';
+            state.isTransitioning = false;
+            showScreen('raceSelect');
+        }, 600);
+    });
+
+    backBtn.addEventListener('click', () => {
+        ['shaking','rolling','fly-left'].forEach(c => diceLeft.classList.remove(c));
+        ['shaking','rolling','fly-right'].forEach(c => diceRight.classList.remove(c));
+        tavernScene.classList.remove('magic-active','flash');
+        startLinkContainer.classList.remove('magic-active');
+        startLink.style.opacity = '1';
+        state.isTransitioning = false;
+        showScreen('welcome');
+    });
+
+    themeSwitch.addEventListener('change', toggleTheme);
+
+    diceLeft.addEventListener('click', (e) => { e.stopPropagation(); rollDice(diceLeft); });
+    diceRight.addEventListener('click', (e) => { e.stopPropagation(); rollDice(diceRight); });
+
+    document.querySelectorAll('.race-card').forEach(c => {
+        c.addEventListener('click', function() {
+            const r = this.dataset.race;
+            this.style.transform = 'scale(0.95)';
+            setTimeout(() => {
+                this.style.transform = '';
+                alert(({human:'🍃 Человек',elf:'🧝 Эльф',dwarf:'⚒️ Дварф'})[r] + '\n\nСкоро появится!');
+            }, 150);
+        });
+    });
+
+    // Инициализация
+    drawDiceFaces(diceLeft, Math.floor(Math.random() * 6) + 1);
+    drawDiceFaces(diceRight, Math.floor(Math.random() * 6) + 1);
+    themeSwitch.checked = false;
+    body.setAttribute('data-theme', 'dark');
+    
+    // Запускаем первую анимацию
+    animateWelcomeText();
+    state.hasVisited = true;
+})();
+</script><script>
+    (function() {
+        'use strict';
+
+        const state = {
+            currentScreen: 'welcome',
+            theme: 'dark',
+            isTransitioning: false,
+            hasVisited: false
+        };
+
+        const welcomeScreen = document.getElementById('welcomeScreen');
+        const raceScreen = document.getElementById('raceScreen');
+        const startLink = document.getElementById('startJourneyLink');
+        const startLinkContainer = document.querySelector('.start-link-container');
+        const backBtn = document.getElementById('backToWelcomeBtn');
+        const themeSwitch = document.getElementById('themeSwitch');
+        const body = document.body;
+        const diceLeft = document.getElementById('diceLeft');
+        const diceRight = document.getElementById('diceRight');
+        const tavernScene = document.querySelector('.tavern-scene');
+
+        const greetingText = document.querySelector('.greeting-text');
+        const welcomeMessage = document.querySelector('.welcome-message');
+        const reassuranceText = document.querySelector('.reassurance-text');
+        const callToAction = document.querySelector('.call-to-action');
+
+        const textElements = [greetingText, welcomeMessage, reassuranceText, callToAction, startLinkContainer];
+
+        function showScreen(screenId) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    
+    if (screenId === 'welcome') {
+        welcomeScreen.classList.add('active');
+        
+        // Текст появляется постепенно ТОЛЬКО при первом заходе
+        if (!state.hasVisited) {
+            state.hasVisited = true;
+            animateWelcomeText();
+        } else {
+            showAllText();
+        }
+    } else if (screenId === 'raceSelect') {
+        raceScreen.classList.add('active');
+    }
+    
+    state.currentScreen = screenId;
+}
+
+function animateWelcomeText() {
+    const delays = [300, 1000, 2400, 3800, 5000];
+
+    // Сначала всё скрываем
+    textElements.forEach(el => {
+        el.style.opacity = '0';
+        el.style.transform = 'translateY(15px)';
+        el.style.transition = 'opacity 0.6s ease-out, transform 0.6s ease-out';
+    });
+
+    // Появляем по очереди
+    textElements.forEach((el, i) => {
+        setTimeout(() => {
+            el.style.opacity = '1';
+            el.style.transform = 'translateY(0)';
+        }, delays[i]);
+    });
+}
+
+function showAllText() {
+    textElements.forEach(el => {
+        el.style.transition = 'none';  // Убираем анимацию
+        el.style.opacity = '1';
+        el.style.transform = 'translateY(0)';
+    });
+}
+
+        function toggleTheme() {
+            body.setAttribute('data-theme', themeSwitch.checked ? 'light' : 'dark');
+        }
+
+        function drawDiceFaces(d, v) {
+            d.innerHTML = '';
+            const p = {
+                1: ['center'], 2: ['top-left','bottom-right'], 3: ['top-left','center','bottom-right'],
+                4: ['top-left','top-right','bottom-left','bottom-right'],
+                5: ['top-left','top-right','center','bottom-left','bottom-right'],
+                6: ['top-left','top-right','middle-left','middle-right','bottom-left','bottom-right']
+            };
+            p[v].forEach(pos => {
+                const dot = document.createElement('span');
+                dot.className = 'dot ' + pos;
+                d.appendChild(dot);
+            });
+        }
+
+        function rollDice(d) {
+            if (d.classList.contains('rolling') || d.classList.contains('shaking') || state.isTransitioning) return;
+            d.classList.add('rolling');
+            let i = 0;
+            const t = setInterval(() => {
+                drawDiceFaces(d, Math.floor(Math.random() * 6) + 1);
+                if (++i >= 8) {
+                    clearInterval(t);
+                    drawDiceFaces(d, Math.floor(Math.random() * 6) + 1);
+                    setTimeout(() => d.classList.remove('rolling'), 100);
+                }
+            }, 50);
+        }
+
+        startLink.addEventListener('mouseenter', () => {
+            if (state.isTransitioning) return;
+            diceLeft.classList.add('shaking');
+            diceRight.classList.add('shaking');
+            tavernScene.classList.add('magic-active');
+            startLinkContainer.classList.add('magic-active');
+        });
+
+        startLink.addEventListener('mouseleave', () => {
+            diceLeft.classList.remove('shaking');
+            diceRight.classList.remove('shaking');
+            tavernScene.classList.remove('magic-active');
+            startLinkContainer.classList.remove('magic-active');
+        });
+
+        startLink.addEventListener('click', () => {
+            if (state.isTransitioning) return;
+            state.isTransitioning = true;
+
+            diceLeft.classList.remove('shaking');
+            diceRight.classList.remove('shaking');
+            tavernScene.classList.remove('magic-active');
+            startLinkContainer.classList.remove('magic-active');
+
+            diceLeft.classList.add('fly-left');
+            diceRight.classList.add('fly-right');
+            tavernScene.classList.add('flash');
+            startLink.style.opacity = '0';
+
+            setTimeout(() => {
+                diceLeft.classList.remove('fly-left');
+                diceRight.classList.remove('fly-right');
+                tavernScene.classList.remove('flash');
+                startLink.style.opacity = '1';
+                state.isTransitioning = false;
+                showScreen('raceSelect');
+            }, 600);
+        });
+
+        backBtn.addEventListener('click', () => {
+            ['shaking','rolling','fly-left'].forEach(c => diceLeft.classList.remove(c));
+            ['shaking','rolling','fly-right'].forEach(c => diceRight.classList.remove(c));
+            tavernScene.classList.remove('magic-active','flash');
+            startLinkContainer.classList.remove('magic-active');
+            startLink.style.opacity = '1';
+            state.isTransitioning = false;
+            showScreen('welcome');
+        });
+
+        themeSwitch.addEventListener('change', toggleTheme);
+
+        diceLeft.addEventListener('click', (e) => { e.stopPropagation(); rollDice(diceLeft); });
+        diceRight.addEventListener('click', (e) => { e.stopPropagation(); rollDice(diceRight); });
+
+        document.querySelectorAll('.race-card').forEach(c => {
+            c.addEventListener('click', function() {
+                const r = this.dataset.race;
+                this.style.transform = 'scale(0.95)';
+                setTimeout(() => {
+                    this.style.transform = '';
+                    alert(({human:'🍃 Человек',elf:'🧝 Эльф',dwarf:'⚒️ Дварф'})[r] + '\n\nСкоро появится!');
+                }, 150);
+            });
+        });
+
+        // Инициализация
+        drawDiceFaces(diceLeft, Math.floor(Math.random() * 6) + 1);
+        drawDiceFaces(diceRight, Math.floor(Math.random() * 6) + 1);
+        themeSwitch.checked = false;
+        body.setAttribute('data-theme', 'dark');
+        showAllText();  // Сначала показываем всё, потом скрываем и анимируем
+state.hasVisited = false;  // Сбрасываем флаг
+animateWelcomeText();  // Запускаем первую анимацию
+state.hasVisited = true;  // Ставим флаг, что уже видели
+    })();
+    </script><script>
+(function() {
+    'use strict';
+
+    const state = {
+        currentScreen: 'welcome',
+        theme: 'dark',
+        isTransitioning: false,
+        hasVisited: false
+    };
+
+    const welcomeScreen = document.getElementById('welcomeScreen');
+    const raceScreen = document.getElementById('raceScreen');
+    const startLink = document.getElementById('startJourneyLink');
+    const startLinkContainer = document.querySelector('.start-link-container');
+    const backBtn = document.getElementById('backToWelcomeBtn');
+    const themeSwitch = document.getElementById('themeSwitch');
+    const body = document.body;
+    const diceLeft = document.getElementById('diceLeft');
+    const diceRight = document.getElementById('diceRight');
+    const tavernScene = document.querySelector('.tavern-scene');
+
+    const greetingText = document.querySelector('.greeting-text');
+    const welcomeMessage = document.querySelector('.welcome-message');
+    const reassuranceText = document.querySelector('.reassurance-text');
+    const callToAction = document.querySelector('.call-to-action');
+
+    const textElements = [greetingText, welcomeMessage, reassuranceText, callToAction, startLinkContainer];
+
+    function showScreen(screenId) {
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        
+        if (screenId === 'welcome') {
+            welcomeScreen.classList.add('active');
+            
+            if (!state.hasVisited) {
+                state.hasVisited = true;
+                animateWelcomeText();
+            } else {
+                showAllText();
+            }
+        } else if (screenId === 'raceSelect') {
+            raceScreen.classList.add('active');
+        }
+        
+        state.currentScreen = screenId;
+    }
+
+    function animateWelcomeText() {
+        const delays = [300, 1000, 2400, 3800, 5000];
+
+        textElements.forEach(el => {
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(15px)';
+            el.style.transition = 'opacity 0.6s ease-out, transform 0.6s ease-out';
+        });
+
+        textElements.forEach((el, i) => {
+            setTimeout(() => {
+                el.style.opacity = '1';
+                el.style.transform = 'translateY(0)';
+            }, delays[i]);
+        });
+    }
+
+    function showAllText() {
+        textElements.forEach(el => {
+            el.style.transition = 'none';
+            el.style.opacity = '1';
+            el.style.transform = 'translateY(0)';
+        });
+    }
+
+    function toggleTheme() {
+        body.setAttribute('data-theme', themeSwitch.checked ? 'light' : 'dark');
+    }
+
+    function drawDiceFaces(d, v) {
+        d.innerHTML = '';
+        const p = {
+            1: ['center'], 2: ['top-left','bottom-right'], 3: ['top-left','center','bottom-right'],
+            4: ['top-left','top-right','bottom-left','bottom-right'],
+            5: ['top-left','top-right','center','bottom-left','bottom-right'],
+            6: ['top-left','top-right','middle-left','middle-right','bottom-left','bottom-right']
+        };
+        p[v].forEach(pos => {
+            const dot = document.createElement('span');
+            dot.className = 'dot ' + pos;
+            d.appendChild(dot);
+        });
+    }
+
+    function rollDice(d) {
+        if (d.classList.contains('rolling') || d.classList.contains('shaking') || state.isTransitioning) return;
+        d.classList.add('rolling');
+        let i = 0;
+        const t = setInterval(() => {
+            drawDiceFaces(d, Math.floor(Math.random() * 6) + 1);
+            if (++i >= 8) {
+                clearInterval(t);
+                drawDiceFaces(d, Math.floor(Math.random() * 6) + 1);
+                setTimeout(() => d.classList.remove('rolling'), 100);
+            }
+        }, 50);
+    }
+
+    startLink.addEventListener('mouseenter', () => {
+        if (state.isTransitioning) return;
+        diceLeft.classList.add('shaking');
+        diceRight.classList.add('shaking');
+        tavernScene.classList.add('magic-active');
+        startLinkContainer.classList.add('magic-active');
+    });
+
+    startLink.addEventListener('mouseleave', () => {
+        diceLeft.classList.remove('shaking');
+        diceRight.classList.remove('shaking');
+        tavernScene.classList.remove('magic-active');
+        startLinkContainer.classList.remove('magic-active');
+    });
+
+    startLink.addEventListener('click', () => {
+        if (state.isTransitioning) return;
+        state.isTransitioning = true;
+
+        diceLeft.classList.remove('shaking');
+        diceRight.classList.remove('shaking');
+        tavernScene.classList.remove('magic-active');
+        startLinkContainer.classList.remove('magic-active');
+
+        diceLeft.classList.add('fly-left');
+        diceRight.classList.add('fly-right');
+        tavernScene.classList.add('flash');
+        startLink.style.opacity = '0';
+
+        setTimeout(() => {
+            diceLeft.classList.remove('fly-left');
+            diceRight.classList.remove('fly-right');
+            tavernScene.classList.remove('flash');
+            startLink.style.opacity = '1';
+            state.isTransitioning = false;
+            showScreen('raceSelect');
+        }, 600);
+    });
+
+    backBtn.addEventListener('click', () => {
+        ['shaking','rolling','fly-left'].forEach(c => diceLeft.classList.remove(c));
+        ['shaking','rolling','fly-right'].forEach(c => diceRight.classList.remove(c));
+        tavernScene.classList.remove('magic-active','flash');
+        startLinkContainer.classList.remove('magic-active');
+        startLink.style.opacity = '1';
+        state.isTransitioning = false;
+        showScreen('welcome');
+    });
+
+    themeSwitch.addEventListener('change', toggleTheme);
+
+    diceLeft.addEventListener('click', (e) => { e.stopPropagation(); rollDice(diceLeft); });
+    diceRight.addEventListener('click', (e) => { e.stopPropagation(); rollDice(diceRight); });
+
+    document.querySelectorAll('.race-card').forEach(c => {
+        c.addEventListener('click', function() {
+            const r = this.dataset.race;
+            this.style.transform = 'scale(0.95)';
+            setTimeout(() => {
+                this.style.transform = '';
+                alert(({human:'🍃 Человек',elf:'🧝 Эльф',dwarf:'⚒️ Дварф'})[r] + '\n\nСкоро появится!');
+            }, 150);
+        });
+    });
+
+    // Инициализация
+    drawDiceFaces(diceLeft, Math.floor(Math.random() * 6) + 1);
+    drawDiceFaces(diceRight, Math.floor(Math.random() * 6) + 1);
+    themeSwitch.checked = false;
+    body.setAttribute('data-theme', 'dark');
+    
+    // Запускаем первую анимацию
+    animateWelcomeText();
+    state.hasVisited = true;
+})();
+</script>
+</body>
+</html>
