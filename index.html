@@ -209,10 +209,7 @@
     transform-origin: center bottom;
 }
 
-.silhouette-face {
-    animation: breatheFace 4s ease-in-out infinite, faceDepth 4s ease-in-out 0.15s infinite;;
-    transform-origin: center center;
-}
+
 
 @keyframes breatheBody {
     0%, 100% { transform: translateX(-50%) scale(1, 1); }
@@ -1259,8 +1256,8 @@ function createParticle() {
     const particle = document.createElement('div');
     particle.classList.add('dust-particle');
     
-    // Размер: от 2px до 7px — крупнее, заметнее
-    const size = getRandomInRange(2, 7);
+    // Размер: от  до  — крупнее, заметнее
+    const size = getRandomInRange(5, 10);
     
     // Появляются по ВСЕЙ сцене — от самого низа до верха
     const x = getRandomInRange(0, particlesContainer.offsetWidth || 1000);
@@ -1281,7 +1278,7 @@ function createParticle() {
     }
     
     // 20% пылинок — с зелёным оттенком (реагируют на магию)
-    const isGreen = Math.random() < 0.2;
+    const isGreen = true
     if (isGreen) {
         particle.classList.add('green-tinted');
     }
@@ -1342,7 +1339,7 @@ if (particlesContainer) {
         }
     }, 2000);
 }
-<!-- ------------------------ -->
+//--------------------------------------------------------
     function animateWelcomeText() {
         const delays = [300, 1000, 2400, 3800, 5000];
 
@@ -1403,26 +1400,6 @@ if (particlesContainer) {
             }, 100);
         }
     }, 50);
-}
-
-function checkDoubleSix() {
-    const smile = document.querySelector('.silhouette-smile');
-    if (!smile) return;
-    
-    // Ищем точки на кубиках — 6 точек = выпало 6
-    const leftDots = diceLeft.querySelectorAll('.dot').length;
-    const rightDots = diceRight.querySelectorAll('.dot').length;
-    
-    if (leftDots === 6 && rightDots === 6) {
-        smile.classList.add('visible');
-        // Убираем улыбку через 3 секунды
-        clearTimeout(smile._timeout);
-        smile._timeout = setTimeout(() => {
-            smile.classList.remove('visible');
-        }, 3000);
-    } else {
-        smile.classList.remove('visible');
-    }
 }
 
     startLink.addEventListener('mouseenter', () => {
