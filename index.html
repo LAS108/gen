@@ -54,7 +54,7 @@
             background: var(--bg-dark);
             min-height: 100vh;
             display: flex;
-            align-items: center;
+            align-items: flex-start;
             justify-content: center;
             padding: 10px;
             background-image: 
@@ -134,6 +134,7 @@
             max-width: 1000px;
             width: 100%;
             margin: 0 auto;
+			padding: 0 10px;
         }
 
         .screen {
@@ -153,12 +154,13 @@
         /* ===== СЦЕНА ТАВЕРНЫ ===== */
         .tavern-scene {
             position: relative;
-            min-height: 750px;
+            min-height: calc(100vh - 60px); /* высота экрана минус отступы сверху и снизу */
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             padding: 20px 20px 40px;
+			margin-top: 40px; 
             background: var(--bg-medium);
             border-radius: 48px;
             border: 2px solid var(--border-color);
@@ -902,6 +904,7 @@
 }
 
         /* ===== АДАПТИВНОСТЬ ===== */
+		
         @media (max-width: 900px) {
             .table { width: 450px; height: 30px; }
             .table::before, .table::after { bottom: -55px; width: 20px; height: 55px; }
@@ -958,9 +961,8 @@
         }
 
         @media (max-width: 500px) {
-            body { padding: 5px; align-items: flex-start; min-height: auto; }
-            .app { max-width: 100%; width: 100%; padding-top: 35px; }
-            .tavern-scene { height: auto; margin: 20px; padding: 25px; border-radius: 20px; width: 100%; }
+            
+            
             .table { width: 250px; height: 20px; bottom: 35px; }
             .table::before, .table::after { bottom: -32px; width: 14px; height: 32px; }
             .table::before { left: 40px; }
@@ -1257,11 +1259,12 @@ function createParticle() {
     const particle = document.createElement('div');
     particle.classList.add('dust-particle');
     
-    const size = getRandomInRange(1.5, 4);
+    // Размер: от 2px до 7px — крупнее, заметнее
+    const size = getRandomInRange(2, 7);
     
-    // Появляются в верхней половине сцены — там где свет
+    // Появляются по ВСЕЙ сцене — от самого низа до верха
     const x = getRandomInRange(0, particlesContainer.offsetWidth || 1000);
-    const y = getRandomInRange(0, (particlesContainer.offsetHeight || 750) * 0.6);
+    const y = getRandomInRange(0, particlesContainer.offsetHeight || 750);
     
     const driftX = getRandomInRange(-50, 50);
     const driftY = getRandomInRange(-80, -20);
@@ -1285,6 +1288,9 @@ function createParticle() {
     
     const lifetime = getRandomInRange(4000, 9000);
     
+    // Свечение зависит от размера
+    const glowSize = size * 3;
+    
     particle.style.cssText = `
         width: ${size}px;
         height: ${size}px;
@@ -1293,7 +1299,7 @@ function createParticle() {
         --drift-x: ${driftX}px;
         --drift-y: ${driftY}px;
         animation-duration: ${lifetime}ms;
-        box-shadow: 0 0 ${size * 2.5}px rgba(255, 200, 120, 0.7);
+        box-shadow: 0 0 ${glowSize}px rgba(255, 200, 120, 0.7);
         background: ${color} 1);
     `;
     
