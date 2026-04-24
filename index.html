@@ -696,16 +696,14 @@
 
         /* ===== ТЕКСТ ===== */
         .welcome-text-container {
-            position: absolute;
-            top: 5px;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 30;
-            text-align: center;
-            max-width: 700px;
-            width: 90%;
-            padding: 10px;
-        }
+    position: relative;
+    margin: 0 auto;
+    z-index: 30;
+    text-align: center;
+    max-width: 700px;
+    width: 90%;
+    padding: 10px;
+}
 
         .greeting-text {
             color: var(--text-primary);
@@ -1274,7 +1272,7 @@ function createParticle() {
     particle.classList.add('dust-particle');
     
     // Размер: от 2px до 7px — крупнее, заметнее
-    const size = getRandomInRange(2, 7);
+    const size = getRandomInRange(5, 15);
     
     // Появляются по ВСЕЙ сцене — от самого низа до верха
     const x = getRandomInRange(0, particlesContainer.offsetWidth || 1000);
@@ -1295,7 +1293,7 @@ function createParticle() {
     }
     
     // 20% пылинок — с зелёным оттенком (реагируют на магию)
-    const isGreen = Math.random() < 0.2;
+    const isGreen = true;
     if (isGreen) {
         particle.classList.add('green-tinted');
     }
