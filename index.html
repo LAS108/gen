@@ -54,7 +54,7 @@
             background: var(--bg-dark);
             min-height: 100vh;
             display: flex;
-            align-items: center;
+            align-items: flex-start;
             justify-content: center;
             padding: 10px;
             background-image: 
@@ -134,6 +134,7 @@
             max-width: 1000px;
             width: 100%;
             margin: 0 auto;
+			padding: 0 10px;
         }
 
         .screen {
@@ -153,12 +154,13 @@
         /* ===== СЦЕНА ТАВЕРНЫ ===== */
         .tavern-scene {
             position: relative;
-            min-height: 750px;
+            min-height: calc(100vh - 60px); /* высота экрана минус отступы сверху и снизу */
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             padding: 20px 20px 40px;
+			margin-top: 40px; 
             background: var(--bg-medium);
             border-radius: 48px;
             border: 2px solid var(--border-color);
@@ -178,6 +180,157 @@
                 radial-gradient(circle at 30% 40%, rgba(255, 200, 100, 0.03) 0%, transparent 30%),
                 radial-gradient(circle at 70% 60%, rgba(255, 200, 100, 0.02) 0%, transparent 40%);
             pointer-events: none;
+        }
+
+        /* ===== СИЛУЭТ ЗЕЛЁНОГО ===== */
+        .green-silhouette {
+            position: absolute;
+            bottom: 75px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 10;
+            pointer-events: none;
+        }
+
+        .silhouette-container {
+            position: relative;
+            width: 160px;
+            height: 200px;
+        }
+		
+		/* ===== ДЫХАНИЕ СИЛУЭТА ===== */
+.silhouette-body {
+    animation: breatheBody 4s ease-in-out infinite;
+    transform-origin: center bottom;
+}
+
+.silhouette-hood {
+    animation: breatheHood 4s ease-in-out infinite;
+    transform-origin: center bottom;
+}
+
+.silhouette-face {
+    animation: breatheFace 4s ease-in-out infinite, faceDepth 4s ease-in-out 0.15s infinite;;
+    transform-origin: center center;
+}
+
+@keyframes breatheBody {
+    0%, 100% { transform: translateX(-50%) scale(1, 1); }
+    50% { transform: translateX(-50%) scale(1.02, 1.01); }
+}
+
+@keyframes breatheHood {
+    0%, 100% { transform: translateX(-50%) translateY(0); }
+    50% { transform: translateX(-50%) translateY(-1.5px); }
+}
+
+@keyframes breatheFace {
+    0%, 100% { transform: translateX(-50%) scale(1); }
+    50% { transform: translateX(-50%) scale(1.01, 1.02); }
+}
+
+/* При наведении — замирает */
+.tavern-scene.magic-active .silhouette-body,
+.tavern-scene.magic-active .silhouette-hood,
+.tavern-scene.magic-active .silhouette-face {
+    animation-play-state: paused;
+}
+
+        /* Тело / плечи */
+        .silhouette-body {
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 140px;
+            height: 140px;
+            background: #0a150a;
+            border-radius: 50% 50% 0 0;
+            clip-path: polygon(15% 100%, 85% 100%, 100% 30%, 80% 0%, 20% 0%, 0% 30%);
+        }
+
+        /* Капюшон */
+        .silhouette-hood {
+            position: absolute;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 110px;
+            background: #0a150a;
+            border-radius: 55% 45% 50% 50%;
+            clip-path: polygon(10% 100%, 90% 100%, 95% 20%, 50% 0%, 5% 20%);
+        }
+
+        /* Провал лица */
+        .silhouette-face {
+    position: absolute;
+    top: 40px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 55px;
+    height: 65px;
+    background: #000000;
+    border-radius: 40% 40% 35% 35%;
+    opacity: 1;
+    box-shadow: inset 0 8px 20px rgba(0, 0, 0, 0.8); /* Тень внутри лица — глубина */
+}
+
+        /* Зелёный отблеск на капюшоне */
+        .silhouette-glow {
+            position: absolute;
+            top: 15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 90px;
+            height: 100px;
+            background: transparent;
+            border-radius: 50%;
+            box-shadow: 0 0 30px rgba(74, 154, 74, 0.15);
+            transition: all 0.5s ease;
+        }
+
+        /* При активации магии — отблеск усиливается */
+        .tavern-scene.magic-active .silhouette-glow {
+            box-shadow: 0 0 45px rgba(74, 180, 74, 0.3);
+        }
+
+        /* Лёгкое движение при наведении */
+        .tavern-scene.magic-active .silhouette-container {
+            animation: greenNod 2s ease-in-out infinite;
+        }
+/* Глаза-огоньки */
+.silhouette-eyes {
+    position: absolute;
+    top: 58px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 36px;
+    height: 10px;
+    display: flex;
+    justify-content: space-between;
+    opacity: 0;
+    transition: opacity 0.6s ease;
+}
+
+.eye-light {
+   width: 9px;
+    height: 5px;
+    background: #126612;
+    border-radius: 40%;
+    box-shadow: 0 0 6px #6ac06a, 0 0 14px rgba(106, 192, 106, 0.8), 0 0 25px rgba(80, 180, 80, 0.5);
+}
+
+/* При активации магии — глаза появляются */
+.tavern-scene.magic-active .silhouette-eyes {
+    opacity: 1;
+    transition: opacity 1s ease;
+}
+
+
+        @keyframes greenNod {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-3px); }
         }
 
         /* ===== СТОЛ ===== */
@@ -704,35 +857,119 @@
             background: rgba(74,154,74,0.15);
         }
 
+/* Контейнер улыбки — только он анимируется */
+.mouth-container {
+    position: absolute;
+    left: 50%;
+    top: 68px;
+    transform: translateX(-50%);
+    width: 34px;
+    height: 14px;
+    z-index: 3;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+.mouth-container.visible {
+    opacity: 1;
+}
+.mouth-smile {
+    position: absolute;
+    left: 5px;
+    top: 7px;
+    width: 24px;
+    height: 12px;
+    background: #126612;
+    border-radius: 50%;
+    box-shadow: 0 0 4px #6ac06a, 0 0 10px rgba(106, 192, 106, 0.7);
+}
+
+.mouth-mask {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 34px;
+    height: 14px;
+    background: #0a150a;
+    border-radius: 50%;
+}
+
+[data-theme="light"] .mouth-mask {
+    background: #1a2a1a;
+}
+
+/* Анимируется только контейнер — оба элемента внутри появляются мгновенно */
+.tavern-scene.magic-active .mouth-container {
+    opacity: 1;
+    transition: opacity 0.3s ease;
+}
+
         /* ===== АДАПТИВНОСТЬ ===== */
+		
         @media (max-width: 900px) {
             .table { width: 450px; height: 30px; }
             .table::before, .table::after { bottom: -55px; width: 20px; height: 55px; }
             .table::before { left: 60px; }
             .table::after { right: 60px; }
             .candle { bottom: 65px; }
-            .candle-left { left: 28%; }
-            .candle-right { right: 28%; }
+            .candle-left { left: 24%; }
+            .candle-right { right: 24%; }
             .dice-on-table { bottom: 70px; }
+            .green-silhouette { bottom: 65px; }
+            .silhouette-container { width: 120px; height: 150px; }
+            .silhouette-body { width: 105px; height: 105px; }
+            .silhouette-hood { width: 75px; height: 83px; top: 8px; }
+            .silhouette-face { width: 42px; height: 50px; top: 30px; }
+            .silhouette-glow { width: 68px; height: 75px; }
             .welcome-text-container { position: relative; transform: translateY(-50px); max-width: 85%; margin: 0 auto; padding: 15px; left: auto; right: auto; }
             .greeting-text { font-size: 34px; }
             .welcome-message { font-size: 19px; }
             .reassurance-text { font-size: 17px; }
             .call-to-action { font-size: 21px; }
             .action-link { font-size: 23px; }
+			/* Глаза — уменьшаем и поднимаем */
+.silhouette-eyes {
+    top: 42px;
+    width: 28px;
+    height: 8px;
+}
+
+.eye-light {
+    width: 7px;
+    height: 4px;
+    border-radius: 40%;
+    box-shadow: 0 0 4px #6ac06a, 0 0 10px rgba(106, 192, 106, 0.8), 0 0 18px rgba(80, 180, 80, 0.5);
+}
+
+/* Улыбка — уменьшаем и поднимаем */
+.mouth-container {
+    top: 52px;
+    width: 26px;
+    height: 10px;
+}
+
+.mouth-smile {
+    left: 4px;
+    top: 5px;
+    width: 18px;
+    height: 9px;
+}
+
+.mouth-mask {
+    width: 26px;
+    height: 10px;
+}
         }
 
         @media (max-width: 500px) {
-            body { padding: 5px; align-items: flex-start; min-height: auto; }
-            .app { max-width: 100%; width: 100%; padding-top: 35px; }
-            .tavern-scene { height: auto; margin: 20px; padding: 25px; border-radius: 20px; width: 100%; }
+            
+            
             .table { width: 250px; height: 20px; bottom: 35px; }
             .table::before, .table::after { bottom: -32px; width: 14px; height: 32px; }
             .table::before { left: 40px; }
             .table::after { right: 40px; }
             .candle { bottom: 45px; }
-            .candle-left { left: 26%; }
-            .candle-right { right: 26%; }
+            .candle-left { left: 20%; }
+            .candle-right { right: 20%; }
             .candle-left .candle-body { width: 14px; height: 44px; }
             .candle-left .candle-wick { height: 9px; top: -9px; }
             .candle-left .candle-flame { width: 12px; height: 22px; top: -22px; }
@@ -748,13 +985,96 @@
             .dice-on-table { bottom: 45px; gap: 12px; }
             .dice { width: 28px; height: 28px; padding: 3px; border-radius: 5px; }
             .dot { width: 5px; height: 5px; }
+            .green-silhouette { bottom: 45px; }
+            .silhouette-container { width: 90px; height: 110px; }
+            .silhouette-body { width: 78px; height: 78px; }
+            .silhouette-hood { width: 56px; height: 62px; top: 6px; }
+            .silhouette-face { width: 30px; height: 36px; top: 23px; }
+            .silhouette-glow { width: 50px; height: 55px; }
             .welcome-text-container { position: relative; transform: none; margin: 0 auto 15px; padding: 8px; max-width: 100%; }
             .greeting-text { font-size: 22px; margin-bottom: 10px; }
             .welcome-message { font-size: 14px; margin-bottom: 15px; }
             .reassurance-text { font-size: 12px; margin-bottom: 12px; }
             .call-to-action { font-size: 15px; margin-bottom: 12px; }
             .action-link { font-size: 17px; padding: 5px 18px; }
+			.silhouette-eyes {
+    top: 28px;
+    width: 22px;
+    height: 6px;
+}
+
+.eye-light {
+    width: 5px;
+    height: 3px;
+    border-radius: 40%;
+    box-shadow: 0 0 3px #6ac06a, 0 0 7px rgba(106, 192, 106, 0.8);
+}
+
+.mouth-container {
+    top: 35px;
+    width: 20px;
+    height: 8px;
+}
+
+.mouth-smile {
+    left: 3px;
+    top: 4px;
+    width: 14px;
+    height: 7px;
+}
+
+.mouth-mask {
+    width: 20px;
+    height: 8px;
+}
         }
+		
+		
+		#particles-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 10;
+}
+
+.dust-particle {
+    position: absolute;
+    border-radius: 50%;
+    pointer-events: none;
+    animation: floatDust linear infinite;
+    opacity: 0;
+}
+
+/* При наведении — часть пылинок зеленеет */
+.tavern-scene.magic-active .dust-particle.green-tinted {
+    background: rgba(160, 220, 160, 0.7) !important;
+    box-shadow: 0 0 6px rgba(130, 210, 130, 0.5) !important;
+    transition: all 0.8s ease;
+}
+
+@keyframes floatDust {
+    0% {
+        opacity: 0;
+        transform: translate(0, 0) scale(0.3);
+    }
+    5% {
+        opacity: 1;
+    }
+    30% {
+        opacity: 0.8;
+    }
+    80% {
+        opacity: 0.3;
+    }
+    100% {
+        opacity: 0;
+        transform: translate(var(--drift-x), var(--drift-y)) scale(0.1);
+    }
+}
+
     </style>
 </head>
 <body data-theme="dark">
@@ -769,10 +1089,28 @@
     </div>
 
     <div class="app">
-        <!-- ПРИВЕТСТВИЕ -->
         <div class="screen active" id="welcomeScreen">
             <div class="tavern-scene">
+			<div id="particles-container"></div>
                 <div class="table"></div>
+                
+                <!-- Силуэт Зелёного -->
+                <div class="green-silhouette">
+                    <div class="silhouette-container">
+    <div class="silhouette-body"></div>
+    <div class="silhouette-hood"></div>
+    <div class="silhouette-face"></div>
+    <div class="silhouette-glow"></div>
+    <div class="silhouette-eyes">
+        <span class="eye-light left"></span>
+        <span class="eye-light right"></span>
+    </div>
+    <div class="mouth-container">
+    <div class="mouth-smile"></div>
+    <div class="mouth-mask"></div>
+</div>
+</div>
+                </div>
                 
                 <div class="candle candle-left">
                     <div class="candle-body"></div>
@@ -817,10 +1155,10 @@
                         <span class="action-link" id="startJourneyLink">…начать путь</span>
                     </div>
                 </div>
+
             </div>
         </div>
 
-        <!-- ВЫБОР РАСЫ -->
         <div class="screen" id="raceScreen">
             <div class="race-screen-content">
                 <h2>🧝 Выбери свою расу</h2>
@@ -905,6 +1243,106 @@
         state.currentScreen = screenId;
     }
 
+// ===== ПЫЛИНКИ =====
+const particlesContainer = document.getElementById('particles-container');
+const MAX_PARTICLES = 25;
+let activeParticles = 0;
+
+function getRandomInRange(min, max) {
+    return Math.random() * (max - min) + min;
+}
+
+function createParticle() {
+    if (activeParticles >= MAX_PARTICLES) return;
+    if (!particlesContainer) return;
+    
+    const particle = document.createElement('div');
+    particle.classList.add('dust-particle');
+    
+    // Размер: от 2px до 7px — крупнее, заметнее
+    const size = getRandomInRange(2, 7);
+    
+    // Появляются по ВСЕЙ сцене — от самого низа до верха
+    const x = getRandomInRange(0, particlesContainer.offsetWidth || 1000);
+    const y = getRandomInRange(0, particlesContainer.offsetHeight || 750);
+    
+    const driftX = getRandomInRange(-50, 50);
+    const driftY = getRandomInRange(-80, -20);
+    
+    // Только тёплые оттенки
+    const warmth = Math.random();
+    let color;
+    if (warmth < 0.4) {
+        color = 'rgba(255, 240, 210, ';
+    } else if (warmth < 0.8) {
+        color = 'rgba(255, 210, 130, ';
+    } else {
+        color = 'rgba(255, 255, 240, ';
+    }
+    
+    // 20% пылинок — с зелёным оттенком (реагируют на магию)
+    const isGreen = Math.random() < 0.2;
+    if (isGreen) {
+        particle.classList.add('green-tinted');
+    }
+    
+    const lifetime = getRandomInRange(4000, 9000);
+    
+    // Свечение зависит от размера
+    const glowSize = size * 3;
+    
+    particle.style.cssText = `
+        width: ${size}px;
+        height: ${size}px;
+        left: ${x}px;
+        top: ${y}px;
+        --drift-x: ${driftX}px;
+        --drift-y: ${driftY}px;
+        animation-duration: ${lifetime}ms;
+        box-shadow: 0 0 ${glowSize}px rgba(255, 200, 120, 0.7);
+        background: ${color} 1);
+    `;
+    
+    particlesContainer.appendChild(particle);
+    activeParticles++;
+    
+    setTimeout(() => {
+        if (particle.parentNode) {
+            particle.remove();
+            activeParticles--;
+        }
+    }, lifetime);
+}
+
+function spawnLoop() {
+    const interval = getRandomInRange(200, 600);
+    setTimeout(() => {
+        const batchSize = Math.floor(getRandomInRange(1, 3));
+        for (let i = 0; i < batchSize; i++) {
+            createParticle();
+        }
+        spawnLoop();
+    }, interval);
+}
+
+function initialBurst() {
+    for (let i = 0; i < 12; i++) {
+        setTimeout(() => createParticle(), i * 80);
+    }
+}
+
+// Запуск пылинок
+if (particlesContainer) {
+    initialBurst();
+    spawnLoop();
+    
+    setInterval(() => {
+        if (activeParticles < MAX_PARTICLES * 0.5) {
+            for (let i = 0; i < 5; i++) createParticle();
+        }
+    }, 2000);
+}
+<!-- ------------------------ -->
     function animateWelcomeText() {
         const delays = [300, 1000, 2400, 3800, 5000];
 
@@ -950,18 +1388,23 @@
     }
 
     function rollDice(d) {
-        if (d.classList.contains('rolling') || d.classList.contains('shaking') || state.isTransitioning) return;
-        d.classList.add('rolling');
-        let i = 0;
-        const t = setInterval(() => {
-            drawDiceFaces(d, Math.floor(Math.random() * 6) + 1);
-            if (++i >= 8) {
-                clearInterval(t);
-                drawDiceFaces(d, Math.floor(Math.random() * 6) + 1);
-                setTimeout(() => d.classList.remove('rolling'), 100);
-            }
-        }, 50);
-    }
+    if (d.classList.contains('rolling') || d.classList.contains('shaking') || state.isTransitioning) return;
+    d.classList.add('rolling');
+    let i = 0;
+    const t = setInterval(() => {
+        drawDiceFaces(d, Math.floor(Math.random() * 6) + 1);
+        if (++i >= 8) {
+            clearInterval(t);
+            const finalValue = Math.floor(Math.random() * 6) + 1;
+            drawDiceFaces(d, finalValue);
+            setTimeout(() => {
+                d.classList.remove('rolling');
+                checkDoubleSix();
+            }, 100);
+        }
+    }, 50);
+}
+
 
     startLink.addEventListener('mouseenter', () => {
         if (state.isTransitioning) return;
@@ -1028,381 +1471,30 @@
         });
     });
 
-    // Инициализация
     drawDiceFaces(diceLeft, Math.floor(Math.random() * 6) + 1);
     drawDiceFaces(diceRight, Math.floor(Math.random() * 6) + 1);
     themeSwitch.checked = false;
     body.setAttribute('data-theme', 'dark');
-    
-    // Запускаем первую анимацию
+    checkDoubleSix();
     animateWelcomeText();
     state.hasVisited = true;
+	
+	function checkDoubleSix() {
+    const mouth = document.querySelector('.mouth-container');
+    if (!mouth) return;
+    
+    const leftDots = diceLeft.querySelectorAll('.dot').length;
+    const rightDots = diceRight.querySelectorAll('.dot').length;
+    
+    if (leftDots === 6 && rightDots === 6) {
+        mouth.classList.add('visible');
+        clearTimeout(mouth._timeout);
+        mouth._timeout = setTimeout(() => {
+            mouth.classList.remove('visible');
+        }, 3000);
+    }
+}
 })();
-</script><script>
-    (function() {
-        'use strict';
-
-        const state = {
-            currentScreen: 'welcome',
-            theme: 'dark',
-            isTransitioning: false,
-            hasVisited: false
-        };
-
-        const welcomeScreen = document.getElementById('welcomeScreen');
-        const raceScreen = document.getElementById('raceScreen');
-        const startLink = document.getElementById('startJourneyLink');
-        const startLinkContainer = document.querySelector('.start-link-container');
-        const backBtn = document.getElementById('backToWelcomeBtn');
-        const themeSwitch = document.getElementById('themeSwitch');
-        const body = document.body;
-        const diceLeft = document.getElementById('diceLeft');
-        const diceRight = document.getElementById('diceRight');
-        const tavernScene = document.querySelector('.tavern-scene');
-
-        const greetingText = document.querySelector('.greeting-text');
-        const welcomeMessage = document.querySelector('.welcome-message');
-        const reassuranceText = document.querySelector('.reassurance-text');
-        const callToAction = document.querySelector('.call-to-action');
-
-        const textElements = [greetingText, welcomeMessage, reassuranceText, callToAction, startLinkContainer];
-
-        function showScreen(screenId) {
-    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-    
-    if (screenId === 'welcome') {
-        welcomeScreen.classList.add('active');
-        
-        // Текст появляется постепенно ТОЛЬКО при первом заходе
-        if (!state.hasVisited) {
-            state.hasVisited = true;
-            animateWelcomeText();
-        } else {
-            showAllText();
-        }
-    } else if (screenId === 'raceSelect') {
-        raceScreen.classList.add('active');
-    }
-    
-    state.currentScreen = screenId;
-}
-
-function animateWelcomeText() {
-    const delays = [300, 1000, 2400, 3800, 5000];
-
-    // Сначала всё скрываем
-    textElements.forEach(el => {
-        el.style.opacity = '0';
-        el.style.transform = 'translateY(15px)';
-        el.style.transition = 'opacity 0.6s ease-out, transform 0.6s ease-out';
-    });
-
-    // Появляем по очереди
-    textElements.forEach((el, i) => {
-        setTimeout(() => {
-            el.style.opacity = '1';
-            el.style.transform = 'translateY(0)';
-        }, delays[i]);
-    });
-}
-
-function showAllText() {
-    textElements.forEach(el => {
-        el.style.transition = 'none';  // Убираем анимацию
-        el.style.opacity = '1';
-        el.style.transform = 'translateY(0)';
-    });
-}
-
-        function toggleTheme() {
-            body.setAttribute('data-theme', themeSwitch.checked ? 'light' : 'dark');
-        }
-
-        function drawDiceFaces(d, v) {
-            d.innerHTML = '';
-            const p = {
-                1: ['center'], 2: ['top-left','bottom-right'], 3: ['top-left','center','bottom-right'],
-                4: ['top-left','top-right','bottom-left','bottom-right'],
-                5: ['top-left','top-right','center','bottom-left','bottom-right'],
-                6: ['top-left','top-right','middle-left','middle-right','bottom-left','bottom-right']
-            };
-            p[v].forEach(pos => {
-                const dot = document.createElement('span');
-                dot.className = 'dot ' + pos;
-                d.appendChild(dot);
-            });
-        }
-
-        function rollDice(d) {
-            if (d.classList.contains('rolling') || d.classList.contains('shaking') || state.isTransitioning) return;
-            d.classList.add('rolling');
-            let i = 0;
-            const t = setInterval(() => {
-                drawDiceFaces(d, Math.floor(Math.random() * 6) + 1);
-                if (++i >= 8) {
-                    clearInterval(t);
-                    drawDiceFaces(d, Math.floor(Math.random() * 6) + 1);
-                    setTimeout(() => d.classList.remove('rolling'), 100);
-                }
-            }, 50);
-        }
-
-        startLink.addEventListener('mouseenter', () => {
-            if (state.isTransitioning) return;
-            diceLeft.classList.add('shaking');
-            diceRight.classList.add('shaking');
-            tavernScene.classList.add('magic-active');
-            startLinkContainer.classList.add('magic-active');
-        });
-
-        startLink.addEventListener('mouseleave', () => {
-            diceLeft.classList.remove('shaking');
-            diceRight.classList.remove('shaking');
-            tavernScene.classList.remove('magic-active');
-            startLinkContainer.classList.remove('magic-active');
-        });
-
-        startLink.addEventListener('click', () => {
-            if (state.isTransitioning) return;
-            state.isTransitioning = true;
-
-            diceLeft.classList.remove('shaking');
-            diceRight.classList.remove('shaking');
-            tavernScene.classList.remove('magic-active');
-            startLinkContainer.classList.remove('magic-active');
-
-            diceLeft.classList.add('fly-left');
-            diceRight.classList.add('fly-right');
-            tavernScene.classList.add('flash');
-            startLink.style.opacity = '0';
-
-            setTimeout(() => {
-                diceLeft.classList.remove('fly-left');
-                diceRight.classList.remove('fly-right');
-                tavernScene.classList.remove('flash');
-                startLink.style.opacity = '1';
-                state.isTransitioning = false;
-                showScreen('raceSelect');
-            }, 600);
-        });
-
-        backBtn.addEventListener('click', () => {
-            ['shaking','rolling','fly-left'].forEach(c => diceLeft.classList.remove(c));
-            ['shaking','rolling','fly-right'].forEach(c => diceRight.classList.remove(c));
-            tavernScene.classList.remove('magic-active','flash');
-            startLinkContainer.classList.remove('magic-active');
-            startLink.style.opacity = '1';
-            state.isTransitioning = false;
-            showScreen('welcome');
-        });
-
-        themeSwitch.addEventListener('change', toggleTheme);
-
-        diceLeft.addEventListener('click', (e) => { e.stopPropagation(); rollDice(diceLeft); });
-        diceRight.addEventListener('click', (e) => { e.stopPropagation(); rollDice(diceRight); });
-
-        document.querySelectorAll('.race-card').forEach(c => {
-            c.addEventListener('click', function() {
-                const r = this.dataset.race;
-                this.style.transform = 'scale(0.95)';
-                setTimeout(() => {
-                    this.style.transform = '';
-                    alert(({human:'🍃 Человек',elf:'🧝 Эльф',dwarf:'⚒️ Дварф'})[r] + '\n\nСкоро появится!');
-                }, 150);
-            });
-        });
-
-        // Инициализация
-        drawDiceFaces(diceLeft, Math.floor(Math.random() * 6) + 1);
-        drawDiceFaces(diceRight, Math.floor(Math.random() * 6) + 1);
-        themeSwitch.checked = false;
-        body.setAttribute('data-theme', 'dark');
-        showAllText();  // Сначала показываем всё, потом скрываем и анимируем
-state.hasVisited = false;  // Сбрасываем флаг
-animateWelcomeText();  // Запускаем первую анимацию
-state.hasVisited = true;  // Ставим флаг, что уже видели
-    })();
-    </script><script>
-(function() {
-    'use strict';
-
-    const state = {
-        currentScreen: 'welcome',
-        theme: 'dark',
-        isTransitioning: false,
-        hasVisited: false
-    };
-
-    const welcomeScreen = document.getElementById('welcomeScreen');
-    const raceScreen = document.getElementById('raceScreen');
-    const startLink = document.getElementById('startJourneyLink');
-    const startLinkContainer = document.querySelector('.start-link-container');
-    const backBtn = document.getElementById('backToWelcomeBtn');
-    const themeSwitch = document.getElementById('themeSwitch');
-    const body = document.body;
-    const diceLeft = document.getElementById('diceLeft');
-    const diceRight = document.getElementById('diceRight');
-    const tavernScene = document.querySelector('.tavern-scene');
-
-    const greetingText = document.querySelector('.greeting-text');
-    const welcomeMessage = document.querySelector('.welcome-message');
-    const reassuranceText = document.querySelector('.reassurance-text');
-    const callToAction = document.querySelector('.call-to-action');
-
-    const textElements = [greetingText, welcomeMessage, reassuranceText, callToAction, startLinkContainer];
-
-    function showScreen(screenId) {
-        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-        
-        if (screenId === 'welcome') {
-            welcomeScreen.classList.add('active');
-            
-            if (!state.hasVisited) {
-                state.hasVisited = true;
-                animateWelcomeText();
-            } else {
-                showAllText();
-            }
-        } else if (screenId === 'raceSelect') {
-            raceScreen.classList.add('active');
-        }
-        
-        state.currentScreen = screenId;
-    }
-
-    function animateWelcomeText() {
-        const delays = [300, 1000, 2400, 3800, 5000];
-
-        textElements.forEach(el => {
-            el.style.opacity = '0';
-            el.style.transform = 'translateY(15px)';
-            el.style.transition = 'opacity 0.6s ease-out, transform 0.6s ease-out';
-        });
-
-        textElements.forEach((el, i) => {
-            setTimeout(() => {
-                el.style.opacity = '1';
-                el.style.transform = 'translateY(0)';
-            }, delays[i]);
-        });
-    }
-
-    function showAllText() {
-        textElements.forEach(el => {
-            el.style.transition = 'none';
-            el.style.opacity = '1';
-            el.style.transform = 'translateY(0)';
-        });
-    }
-
-    function toggleTheme() {
-        body.setAttribute('data-theme', themeSwitch.checked ? 'light' : 'dark');
-    }
-
-    function drawDiceFaces(d, v) {
-        d.innerHTML = '';
-        const p = {
-            1: ['center'], 2: ['top-left','bottom-right'], 3: ['top-left','center','bottom-right'],
-            4: ['top-left','top-right','bottom-left','bottom-right'],
-            5: ['top-left','top-right','center','bottom-left','bottom-right'],
-            6: ['top-left','top-right','middle-left','middle-right','bottom-left','bottom-right']
-        };
-        p[v].forEach(pos => {
-            const dot = document.createElement('span');
-            dot.className = 'dot ' + pos;
-            d.appendChild(dot);
-        });
-    }
-
-    function rollDice(d) {
-        if (d.classList.contains('rolling') || d.classList.contains('shaking') || state.isTransitioning) return;
-        d.classList.add('rolling');
-        let i = 0;
-        const t = setInterval(() => {
-            drawDiceFaces(d, Math.floor(Math.random() * 6) + 1);
-            if (++i >= 8) {
-                clearInterval(t);
-                drawDiceFaces(d, Math.floor(Math.random() * 6) + 1);
-                setTimeout(() => d.classList.remove('rolling'), 100);
-            }
-        }, 50);
-    }
-
-    startLink.addEventListener('mouseenter', () => {
-        if (state.isTransitioning) return;
-        diceLeft.classList.add('shaking');
-        diceRight.classList.add('shaking');
-        tavernScene.classList.add('magic-active');
-        startLinkContainer.classList.add('magic-active');
-    });
-
-    startLink.addEventListener('mouseleave', () => {
-        diceLeft.classList.remove('shaking');
-        diceRight.classList.remove('shaking');
-        tavernScene.classList.remove('magic-active');
-        startLinkContainer.classList.remove('magic-active');
-    });
-
-    startLink.addEventListener('click', () => {
-        if (state.isTransitioning) return;
-        state.isTransitioning = true;
-
-        diceLeft.classList.remove('shaking');
-        diceRight.classList.remove('shaking');
-        tavernScene.classList.remove('magic-active');
-        startLinkContainer.classList.remove('magic-active');
-
-        diceLeft.classList.add('fly-left');
-        diceRight.classList.add('fly-right');
-        tavernScene.classList.add('flash');
-        startLink.style.opacity = '0';
-
-        setTimeout(() => {
-            diceLeft.classList.remove('fly-left');
-            diceRight.classList.remove('fly-right');
-            tavernScene.classList.remove('flash');
-            startLink.style.opacity = '1';
-            state.isTransitioning = false;
-            showScreen('raceSelect');
-        }, 600);
-    });
-
-    backBtn.addEventListener('click', () => {
-        ['shaking','rolling','fly-left'].forEach(c => diceLeft.classList.remove(c));
-        ['shaking','rolling','fly-right'].forEach(c => diceRight.classList.remove(c));
-        tavernScene.classList.remove('magic-active','flash');
-        startLinkContainer.classList.remove('magic-active');
-        startLink.style.opacity = '1';
-        state.isTransitioning = false;
-        showScreen('welcome');
-    });
-
-    themeSwitch.addEventListener('change', toggleTheme);
-
-    diceLeft.addEventListener('click', (e) => { e.stopPropagation(); rollDice(diceLeft); });
-    diceRight.addEventListener('click', (e) => { e.stopPropagation(); rollDice(diceRight); });
-
-    document.querySelectorAll('.race-card').forEach(c => {
-        c.addEventListener('click', function() {
-            const r = this.dataset.race;
-            this.style.transform = 'scale(0.95)';
-            setTimeout(() => {
-                this.style.transform = '';
-                alert(({human:'🍃 Человек',elf:'🧝 Эльф',dwarf:'⚒️ Дварф'})[r] + '\n\nСкоро появится!');
-            }, 150);
-        });
-    });
-
-    // Инициализация
-    drawDiceFaces(diceLeft, Math.floor(Math.random() * 6) + 1);
-    drawDiceFaces(diceRight, Math.floor(Math.random() * 6) + 1);
-    themeSwitch.checked = false;
-    body.setAttribute('data-theme', 'dark');
-    
-    // Запускаем первую анимацию
-    animateWelcomeText();
-    state.hasVisited = true;
-})();
-</script>
+    </script>
 </body>
 </html>
