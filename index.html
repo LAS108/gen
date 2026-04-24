@@ -697,7 +697,7 @@
         /* ===== ТЕКСТ ===== */
         .welcome-text-container {
             position: absolute;
-            top: 15%;
+            top: 5px;
             left: 50%;
             transform: translateX(-50%);
             z-index: 30;
@@ -1274,7 +1274,7 @@ function createParticle() {
     particle.classList.add('dust-particle');
     
     // Размер: от 2px до 7px — крупнее, заметнее
-    const size = getRandomInRange(5, 15);
+    const size = getRandomInRange(5, 10);
     
     // Появляются по ВСЕЙ сцене — от самого низа до верха
     const x = getRandomInRange(0, particlesContainer.offsetWidth || 1000);
