@@ -50,17 +50,17 @@
         }
 
         body {
-    font-family: 'Segoe UI', 'Arial', sans-serif;
-    background: var(--bg-dark);
-    min-height: 100dvh;
-    display: flex;
-    align-items: flex-start;
-    justify-content: center;
-    padding: 10px;
-    background-image: 
-        repeating-linear-gradient(45deg, var(--texture-line1) 0px, var(--texture-line1) 1px, transparent 1px, transparent 8px),
-        repeating-linear-gradient(-45deg, var(--texture-line2) 0px, var(--texture-line2) 1px, transparent 1px, transparent 8px);
-}
+            font-family: 'Segoe UI', 'Arial', sans-serif;
+            background: var(--bg-dark);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 10px;
+            background-image: 
+                repeating-linear-gradient(45deg, var(--texture-line1) 0px, var(--texture-line1) 1px, transparent 1px, transparent 8px),
+                repeating-linear-gradient(-45deg, var(--texture-line2) 0px, var(--texture-line2) 1px, transparent 1px, transparent 8px);
+        }
 
         .theme-toggle {
             position: fixed;
@@ -131,14 +131,10 @@
         }
 
         .app {
-    max-width: 1000px;
-    width: 100%;
-    margin: 0 auto;
-    padding: 0;
-    min-height: 100dvh;
-    display: flex;
-    flex-direction: column;
-}
+            max-width: 1000px;
+            width: 100%;
+            margin: 0 auto;
+        }
 
         .screen {
             display: none;
@@ -157,30 +153,19 @@
         /* ===== СЦЕНА ТАВЕРНЫ ===== */
         .tavern-scene {
             position: relative;
-    /* Используем dvh — динамическую высоту, которая учитывает адресную строку */
-    min-height: 100dvh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 10px 20px 20px;
-    background: var(--bg-medium);
-    border-radius: 48px;
-    border: 2px solid var(--border-color);
-    box-shadow: 0 20px 40px var(--shadow), inset 0 0 60px rgba(0, 0, 0, 0.2);
-    backdrop-filter: blur(4px);
-    overflow: hidden;
-    box-sizing: border-box;
-			margin-top: 40px;
+            min-height: 750px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px 20px 40px;
+            background: var(--bg-medium);
+            border-radius: 48px;
+            border: 2px solid var(--border-color);
+            box-shadow: 0 20px 40px var(--shadow), inset 0 0 60px rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(4px);
+            overflow: hidden;
         }
-		
-		/* Фикс для старых браузеров, не поддерживающих dvh */
-@supports not (min-height: 100dvh) {
-    .tavern-scene {
-        min-height: 100vh;
-        min-height: -webkit-fill-available;
-    }
-}
 
         .tavern-scene::before {
             content: '';
@@ -917,7 +902,6 @@
 }
 
         /* ===== АДАПТИВНОСТЬ ===== */
-		
         @media (max-width: 900px) {
             .table { width: 450px; height: 30px; }
             .table::before, .table::after { bottom: -55px; width: 20px; height: 55px; }
@@ -974,8 +958,9 @@
         }
 
         @media (max-width: 500px) {
-            
-            
+            body { padding: 5px; align-items: flex-start; min-height: auto; }
+            .app { max-width: 100%; width: 100%; padding-top: 35px; }
+            .tavern-scene { height: auto; margin: 20px; padding: 25px; border-radius: 20px; width: 100%; }
             .table { width: 250px; height: 20px; bottom: 35px; }
             .table::before, .table::after { bottom: -32px; width: 14px; height: 32px; }
             .table::before { left: 40px; }
@@ -1272,12 +1257,11 @@ function createParticle() {
     const particle = document.createElement('div');
     particle.classList.add('dust-particle');
     
-    // Размер: от 2px до 7px — крупнее, заметнее
-    const size = getRandomInRange(2, 7);
+    const size = getRandomInRange(1.5, 4);
     
-    // Появляются по ВСЕЙ сцене — от самого низа до верха
+    // Появляются в верхней половине сцены — там где свет
     const x = getRandomInRange(0, particlesContainer.offsetWidth || 1000);
-    const y = getRandomInRange(0, particlesContainer.offsetHeight || 750);
+    const y = getRandomInRange(0, (particlesContainer.offsetHeight || 750) * 0.6);
     
     const driftX = getRandomInRange(-50, 50);
     const driftY = getRandomInRange(-80, -20);
@@ -1301,9 +1285,6 @@ function createParticle() {
     
     const lifetime = getRandomInRange(4000, 9000);
     
-    // Свечение зависит от размера
-    const glowSize = size * 3;
-    
     particle.style.cssText = `
         width: ${size}px;
         height: ${size}px;
@@ -1312,7 +1293,7 @@ function createParticle() {
         --drift-x: ${driftX}px;
         --drift-y: ${driftY}px;
         animation-duration: ${lifetime}ms;
-        box-shadow: 0 0 ${glowSize}px rgba(255, 200, 120, 0.7);
+        box-shadow: 0 0 ${size * 2.5}px rgba(255, 200, 120, 0.7);
         background: ${color} 1);
     `;
     
@@ -1418,7 +1399,25 @@ if (particlesContainer) {
     }, 50);
 }
 
-
+function checkDoubleSix() {
+    const smile = document.querySelector('.silhouette-smile');
+    if (!smile) return;
+    
+    // Ищем точки на кубиках — 6 точек = выпало 6
+    const leftDots = diceLeft.querySelectorAll('.dot').length;
+    const rightDots = diceRight.querySelectorAll('.dot').length;
+    
+    if (leftDots === 6 && rightDots === 6) {
+        smile.classList.add('visible');
+        // Убираем улыбку через 3 секунды
+        clearTimeout(smile._timeout);
+        smile._timeout = setTimeout(() => {
+            smile.classList.remove('visible');
+        }, 3000);
+    } else {
+        smile.classList.remove('visible');
+    }
+}
 
     startLink.addEventListener('mouseenter', () => {
         if (state.isTransitioning) return;
