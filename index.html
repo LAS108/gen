@@ -50,17 +50,17 @@
         }
 
         body {
-    font-family: 'Segoe UI', 'Arial', sans-serif;
-    background: var(--bg-dark);
-    min-height: 100dvh;
-    display: flex;
-    align-items: flex-start;
-    justify-content: center;
-    padding: 10px;
-    background-image: 
-        repeating-linear-gradient(45deg, var(--texture-line1) 0px, var(--texture-line1) 1px, transparent 1px, transparent 8px),
-        repeating-linear-gradient(-45deg, var(--texture-line2) 0px, var(--texture-line2) 1px, transparent 1px, transparent 8px);
-}
+            font-family: 'Segoe UI', 'Arial', sans-serif;
+            background: var(--bg-dark);
+            min-height: 100vh;
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+            padding: 10px;
+            background-image: 
+                repeating-linear-gradient(45deg, var(--texture-line1) 0px, var(--texture-line1) 1px, transparent 1px, transparent 8px),
+                repeating-linear-gradient(-45deg, var(--texture-line2) 0px, var(--texture-line2) 1px, transparent 1px, transparent 8px);
+        }
 
         .theme-toggle {
             position: fixed;
@@ -131,14 +131,11 @@
         }
 
         .app {
-    max-width: 1000px;
-    width: 100%;
-    margin: 0 auto;
-    padding: 0;
-    min-height: 100dvh;
-    display: flex;
-    flex-direction: column;
-}
+            max-width: 1000px;
+            width: 100%;
+            margin: 0 auto;
+			padding: 0 10px;
+        }
 
         .screen {
             display: none;
@@ -157,31 +154,20 @@
         /* ===== СЦЕНА ТАВЕРНЫ ===== */
         .tavern-scene {
             position: relative;
-    /* Используем dvh — динамическую высоту, которая учитывает адресную строку */
-    min-height: 100dvh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 10px 20px 20px;
-    background: var(--bg-medium);
-    border-radius: 48px;
-    border: 2px solid var(--border-color);
-    box-shadow: 0 20px 40px var(--shadow), inset 0 0 60px rgba(0, 0, 0, 0.2);
-    backdrop-filter: blur(4px);
-    overflow: hidden;
-    box-sizing: border-box;
-			margin-top: 60px;
+            min-height: calc(100vh - 60px); /* высота экрана минус отступы сверху и снизу */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px 20px 40px;
+			margin-top: 40px; 
+            background: var(--bg-medium);
+            border-radius: 48px;
+            border: 2px solid var(--border-color);
+            box-shadow: 0 20px 40px var(--shadow), inset 0 0 60px rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(4px);
+            overflow: hidden;
         }
-
-
-/* Фикс для старых браузеров, не поддерживающих dvh */
-@supports not (min-height: 100dvh) {
-    .tavern-scene {
-        min-height: 100vh;
-        min-height: -webkit-fill-available;
-    }
-}
 
         .tavern-scene::before {
             content: '';
